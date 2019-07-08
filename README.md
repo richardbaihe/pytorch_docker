@@ -60,7 +60,7 @@ $ docker run --runtime=nvidia --rm nvidia/cuda:9.0-base nvidia-smi
 - if you want a quick start, you can pull the image from docker hub and skip the build step
 ```bash
 # pull from docker hub directly
-$ docker pull dfzspzq/anaconda_pytorch_tf
+$ docker pull dfzspzq/anaconda_pytorch_tf:gpu
 # check
 $ docker image ls
 ```
