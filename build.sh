@@ -1,0 +1,1 @@
+docker build -t pytorch_tf:gpu -f Dockerfile .
