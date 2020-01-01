@@ -18,7 +18,8 @@ USER baihe
 WORKDIR $HOME
 COPY ./requirements.txt $HOME/                                                 
 RUN git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \     
-    && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \                                                   && git clone git://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions \
+    && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
+    && git clone git://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions \
     && git clone https://github.com/amix/vimrc.git ~/.vim_runtime \
     && sh ~/.vim_runtime/install_awesome_vimrc.sh
 COPY ./zshrc $HOME/.zshrc
