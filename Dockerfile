@@ -1,14 +1,11 @@
-FROM nvidia/cuda:9.2-cudnn7-devel                                                                        
-MAINTAINER ziqiang pei <dfzspzq@163.com>                                                                 
-                                                                                                         
-                                                                                                         
-ENV HOME=/home/pzq USER=pzq ANACONDA_HOME=/home/pzq/anaconda3                                            
-                                                                                                         
+FROM nvidia/cuda:10.1-cudnn7-devel                                                                        
+MAINTAINER richardbaihe <h32bai@uwaterloo.ca>                                                                 
+ENV HOME=/home/baihe USER=baihe ANACONDA_HOME=/home/baihe/anaconda3                                            
 USER root                                                                                                
 # add user                                                                                               
 RUN useradd --create-home --no-log-init --shell /bin/zsh $USER \                                         
     && adduser $USER sudo \                                                                              
-    && echo 'pzq:password' | chpassw                                                    
+    && echo 'baihe:richardbaihe' | chpasswd                                                    
 
 # install basic tools                                                             
 RUN apt-get update \                                                                                  
@@ -17,21 +14,21 @@ RUN apt-get update \
     && chsh -s /bin/zsh      
                                                                                                          
                                                                                                          
-USER pzq                                                                                                 
+USER baihe                                                                                                 
 WORKDIR $HOME
 COPY ./requirements.txt $HOME/                                                 
 RUN git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \     
-    && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \                                                                                                                                
-    && mkdir ~/Desktop ~/Downloads \                                                                     
-    # for anaconda                                                                                       
-    && wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.03-Linux-x86_64.sh -O ~/anaconda.sh \
+    && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \                                                   && git clone git://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions \
+    && git clone https://github.com/amix/vimrc.git ~/.vim_runtime \
+    && sh ~/.vim_runtime/install_awesome_vimrc.sh
+COPY ./zshrc $HOME/.zshrc
+    # for anaconda                                                                                      
+RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh -O ~/anaconda.sh \
     && /bin/sh ~/anaconda.sh -b -p $ANACONDA_HOME \                                                      
     && rm ~/anaconda.sh \                                                                                
-    && export PATH=$PATH:$HOME/anaconda3/bin \                                                           
-    && pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple \                           
-    && pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple        
+    && export PATH=$PATH:$HOME/anaconda3/bin \                           
+    && pip install --no-cache-dir -r requirements.txt         
                                                                                                          
                                                                                                          
-VOLUME [""]
 
 CMD ["/bin/zsh"]

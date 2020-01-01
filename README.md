@@ -1,4 +1,4 @@
-# DAPT - Docker of anaconda with pytorch and tensorflow
+# Docker of anaconda with pytorch
 
 ![](logo.png)
 
