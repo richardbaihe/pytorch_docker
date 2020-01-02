@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.1-base-ubuntu16.04                                                                        
+FROM nvcr.io/nvidia/pytorch:19.06-py3                                                                        
 MAINTAINER richardbaihe <h32bai@uwaterloo.ca>                                                                 
 ENV HOME=/home/baihe USER=baihe ANACONDA_HOME=/home/baihe/anaconda3                                            
 USER root                                                                                                
@@ -9,7 +9,7 @@ RUN useradd --create-home --no-log-init --shell /bin/zsh $USER \
 
 # install basic tools                                                             
 RUN apt-get update \                                                                                  
-    && apt-get install -y locales zsh git curl libx11-6 libncurses5-dev tmux wget bzip2 sudo vim \   
+    && apt-get install -y gcc locales zsh git curl libx11-6 libncurses5-dev tmux wget bzip2 sudo vim \   
     && rm -rf /var/lib/apt/lists/* \                                                                     
     && chsh -s /bin/zsh      
 
@@ -33,7 +33,7 @@ COPY ./zshrc $HOME/.zshrc
 RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh -O ~/anaconda.sh \
     && /bin/sh ~/anaconda.sh -b -p $ANACONDA_HOME \                                                      
     && rm ~/anaconda.sh \                                                                                
-    && export PATH=$PATH:$HOME/anaconda3/bin \                           
+    && export PATH=$HOME/anaconda3/bin:$PATH \                           
     && pip install --no-cache-dir -r requirements.txt         
                                                                                                          
                                                                                                          

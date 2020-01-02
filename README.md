@@ -2,6 +2,8 @@
 
 ![](logo.png)
 
+ps: based on https://ngc.nvidia.com/catalog/containers/nvidia:pytorch/tags
+
 ## 1. What is this repository for ?
 
 Usually configuring the environment is a boring and painful, and it's easy to make mistakes and takes a lot of time. Docker can help solve this problem very well.  

@@ -97,3 +97,5 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+unsetopt nomatch
+export PATH="/home/baihe/anaconda3/bin:$PATH"
