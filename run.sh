@@ -1,8 +1,8 @@
 docker container run -itd \
     --name gpu_env \
-    --runtime=nvidia -u pzq \
-    --mount type=bind,source=/path/to/data,target=/home/pzq/Desktop/data \
-    --mount type=bind,source=/path/to/code,target=/home/pzq/Desktop/code \
+    --runtime=nvidia -u baihe \
+    --mount type=bind,source=/data/baihe/dataset,target=/home/baihe/dataset \
+    --mount type=bind,source=/data/baihe/checkpoints,target=/home/baihe/checkpoints \
     --shm-size=16g pytorch:gpu /bin/zsh \
 || \
 docker container exec -it gpu_env /bin/zsh

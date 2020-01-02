@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.1-cudnn7-devel                                                                        
+FROM nvidia/cuda:10.1-base-ubuntu16.04                                                                        
 MAINTAINER richardbaihe <h32bai@uwaterloo.ca>                                                                 
 ENV HOME=/home/baihe USER=baihe ANACONDA_HOME=/home/baihe/anaconda3                                            
 USER root                                                                                                
@@ -9,12 +9,18 @@ RUN useradd --create-home --no-log-init --shell /bin/zsh $USER \
 
 # install basic tools                                                             
 RUN apt-get update \                                                                                  
-    && apt-get install -y zsh git-core libevent-dev libncurses5-dev tmux git-all wget bzip2 sudo vim \   
+    && apt-get install -y locales zsh git curl libx11-6 libncurses5-dev tmux wget bzip2 sudo vim \   
     && rm -rf /var/lib/apt/lists/* \                                                                     
     && chsh -s /bin/zsh      
+
+# Set the locale
+RUN locale-gen en_US.UTF-8  
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8  
                                                                                                          
-                                                                                                         
-USER baihe                                                                                                 
+USER $USER
+RUN chmod 777 $HOME
 WORKDIR $HOME
 COPY ./requirements.txt $HOME/                                                 
 RUN git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \     
