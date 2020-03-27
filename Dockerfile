@@ -49,10 +49,18 @@ RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_6
 # ===========
 # latest apex
 # ===========
+USER root
 RUN echo "Installing Apex on top of ${BASE_IMAGE}"
-RUN pip uninstall -y apex && \
-git clone https://github.com/NVIDIA/apex.git ~/apex && \
-cd ~/apex && \
-pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" .
+# make sure we don't overwrite some existing directory called "apex"
+WORKDIR /tmp/unique_for_apex
+# uninstall Apex if present, twice to make absolutely sure :)
+RUN pip uninstall -y apex || :
+RUN pip uninstall -y apex || :
+# SHA is something the user can touch to force recreation of this Docker layer,
+# and therefore force cloning of the latest version of Apex
+RUN SHA=ToUcHMe git clone https://github.com/NVIDIA/apex.git
+WORKDIR /tmp/unique_for_apex/apex
+RUN pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" .
+WORKDIR /workspace
 
 CMD ["/bin/zsh"]
