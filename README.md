@@ -85,3 +85,15 @@ $ docker container run -it \
     --mount type=bind,source=/data/baihe/checkpoints,target=/home/baihe/checkpoints \
     --shm-size=16g richardbaihe/pytorch:gpu /bin/zsh
 ```
+
+### 4 Create a user in the container
+If you pull the pre-built docker image directly from the docker hub, then the 
+default user would be baihe and the password is richarddbaihe. To create
+a user for yourself, run the following command.
+```bash
+sudo useradd --create-home --no-log-init --shell /bin/zsh $USERNAME
+sudo adduser $USERNAME sudo
+sudo passwd $USERNAME
+su - $USERNAME
+
+```
