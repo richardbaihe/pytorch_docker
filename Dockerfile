@@ -1,12 +1,7 @@
 ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:20.06-py3
-FROM $BASE_IMAGE
+FROM $BASE_IMAGE                                                                        
 MAINTAINER richardbaihe <h32bai@uwaterloo.ca>                                                                 
-ENV USER=baihe HOME=/home/baihe ANACONDA_HOME=/opt/anaconda3
-USER root
-# add user
-RUN useradd --create-home --no-log-init --shell /bin/zsh $USER \
-    && adduser $USER sudo \
-    && echo 'baihe:richardbaihe' | chpasswd
+ENV HOME=/home/root USER=baihe ANACONDA_HOME=/opt/anaconda3
 USER root
 
 # ===============
@@ -41,6 +36,15 @@ RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_6
 RUN git clone --depth=1 https://github.com/amix/vimrc.git /opt/vim_runtime \
     && sh /opt/vim_runtime/install_awesome_parameterized.sh /opt/vim_runtime --all
 
+# ===============
+# ohmyzsh
+# ===============
+RUN git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \
+    && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
+    && git clone git://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/plugins/zsh-autosuggestions \
+    && cp -r ~/.oh-my-zsh /etc/skel/
+COPY ./zshrc /etc/skel/.zshrc
+RUN cp /etc/skel/.zshrc ~/.zshrc
 
 # ===========
 # latest apex
@@ -58,19 +62,10 @@ WORKDIR /tmp/unique_for_apex/apex
 COPY ./setup.py /tmp/unique_for_apex/apex/
 RUN pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" .
 
-# ===============
-# ohmyzsh
-# ===============
-COPY ./zshrc /etc/skel/.zshrc
-USER $USER
-RUN chmod 777 $HOME
-RUN git clone https://github.com/robbyrussell/oh-my-zsh.git $HOME/.oh-my-zsh \
-    && git clone git://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/plugins/zsh-autosuggestions \
-    && cp /etc/skel/.zshrc $HOME/.zshrc
-USER root
-RUN cp -r $HOME/.oh-my-zsh /etc/skel/
-
-USER $USER
-WORKDIR $HOME
+# add user
+RUN useradd --create-home --no-log-init --shell /bin/zsh $USER \
+    && adduser $USER sudo \
+    && echo 'baihe:richardbaihe' | chpasswd
+WORKDIR /home/${USER}
 
 CMD ["/bin/zsh"]
