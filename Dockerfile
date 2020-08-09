@@ -60,6 +60,7 @@ RUN pip uninstall -y apex || :
 # SHA is something the user can touch to force recreation of this Docker layer,
 # and therefore force cloning of the latest version of Apex
 RUN SHA=ToUcHMe git clone https://github.com/NVIDIA/apex.git
+COPY ./setup.py $HOME/apex/setup.py
 WORKDIR $HOME/apex
 RUN pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" .
 WORKDIR /workspace
