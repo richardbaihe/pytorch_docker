@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:19.07-py3 
+ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:20.07-py3 
 FROM $BASE_IMAGE                                                                        
 MAINTAINER richardbaihe <h32bai@uwaterloo.ca>                                                                 
 ENV HOME=/home/baihe USER=baihe ANACONDA_HOME=/home/baihe/anaconda3                                            
@@ -42,24 +42,25 @@ COPY ./zshrc $HOME/.zshrc
 # ===============
 RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh -O ~/anaconda.sh \
     && /bin/sh ~/anaconda.sh -b -p $ANACONDA_HOME \                                                      
-    && rm ~/anaconda.sh \                                                                                
-    && export PATH=$HOME/anaconda3/bin:$PATH \                           
-    && pip install --no-cache-dir -r requirements.txt         
+    && rm ~/anaconda.sh                                                                                 
+ENV PATH="$HOME/anaconda3/bin:${PATH}"
+RUN pip install --no-cache-dir -r requirements.txt         
+RUN python -m nltk.downloader punkt
+RUN python -m nltk.downloader stopwords
+RUN python -m nltk.downloader wordnet
+RUN echo $PATH
 
 # ===========
 # latest apex
 # ===========
-USER root
 RUN echo "Installing Apex on top of ${BASE_IMAGE}"
-# make sure we don't overwrite some existing directory called "apex"
-WORKDIR /tmp/unique_for_apex
 # uninstall Apex if present, twice to make absolutely sure :)
 RUN pip uninstall -y apex || :
 RUN pip uninstall -y apex || :
 # SHA is something the user can touch to force recreation of this Docker layer,
 # and therefore force cloning of the latest version of Apex
 RUN SHA=ToUcHMe git clone https://github.com/NVIDIA/apex.git
-WORKDIR /tmp/unique_for_apex/apex
+WORKDIR $HOME/apex
 RUN pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" .
 WORKDIR /workspace
 
