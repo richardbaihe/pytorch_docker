@@ -56,7 +56,7 @@ $ docker image ls
 ```
 
 - otherwise you need build your own image
-- keep in mind that all user name in zshrc and Dockerfile should be replace from "baihe" to your desired name
+- keep in mind that all user name in zshrc and Dockerfile should be replace from "{user}" to your desired name, as well as "{password}".
 ```bash
 $ docker build -t pytorch:gpu -f Dockerfile .
 
