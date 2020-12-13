@@ -1,12 +1,12 @@
 ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:20.07-py3 
 FROM $BASE_IMAGE                                                                        
 MAINTAINER richardbaihe <h32bai@uwaterloo.ca>                                                                 
-ENV HOME=/home/baihe USER=baihe ANACONDA_HOME=/home/baihe/anaconda3                                            
+ENV HOME=/home/{user} USER=baihe ANACONDA_HOME=/home/{user}/anaconda3                                            
 USER root                                                                                                
 # add user                                                                                               
 RUN useradd --create-home --no-log-init --shell /bin/zsh $USER \                                         
     && adduser $USER sudo \                                                                              
-    && echo 'baihe:richardbaihe' | chpasswd                                                    
+    && echo '{user}:{password}' | chpasswd                                                    
 
 # ===============
 # system packages
