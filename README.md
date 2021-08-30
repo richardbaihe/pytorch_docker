@@ -1,7 +1,15 @@
-# Docker of anaconda with pytorch, tmux, zsh.
+# Docker of pytorch with zsh/vim/apex/ssh-login development environment
 
 
-## Installation
+## Quick start
+
+```bash
+$ docker pull richardbaihe/pytorch:lastest
+$ docker container run -itd  --name test_env  --mount type=bind,source=/data/projects/,target=/root/projects --mount type=bind,source=/data/datasets/,target=/root/datasets --mount type=bind,source=/data/checkpoints/,target=/root/checkpoints   --shm-size=16g richardbaihe/pytorch:lastest /bin/zsh
+$ docker attach test_env
+```
+
+## Build your own docker image
 
 Suppose you have cuda already installed, and cuda version is `cuda-9.0`, now you can go ahead with the following steps.
 
@@ -47,18 +55,8 @@ $ docker run --runtime=nvidia --rm nvidia/cuda:9.0-base nvidia-smi
 
 ### 2 build docker image
 
-- if you want a quick start, you can pull the image from docker hub and skip the build step
 ```bash
-# pull from docker hub directly
-$ docker pull richardbaihe/pytorch:gpu
-# check
-$ docker image ls
-```
-
-- otherwise you need build your own image
-- keep in mind that all user name in zshrc and Dockerfile should be replace from "baihe" to your desired name
-```bash
-$ docker build -t pytorch:gpu -f Dockerfile .
+$ docker build -t pytorch:test -f Dockerfile .
 
 # it will take a while, please wait...
 
@@ -67,21 +65,4 @@ REPOSITORY              TAG         IMAGE ID            CREATED             SIZE
 pytorch                 gpu         70fbd709e31e        3 minutes ago       9.76GB
 hello-world             latest      fce289e99eb9        20 minutes ago      1.84kB
 
-```
-
-
-### 3 start a container
-
-- Here, I prepare a datasets folder, a checkpoints folder and a projects folder to synchronize data 
-between local file system and docker file system.
-
-```bash
-# start a container
-$ docker container run -it \
-    --name gpu_env \
-    --runtime=nvidia -u baihe \
-    --mount type=bind,source=/data/baihe/datasets,target=/home/baihe/datasets \
-    --mount type=bind,source=/data/baihe/projects,target=/home/baihe/projects \
-    --mount type=bind,source=/data/baihe/checkpoints,target=/home/baihe/checkpoints \
-    --shm-size=16g richardbaihe/pytorch:gpu /bin/zsh
 ```
