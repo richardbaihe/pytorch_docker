@@ -5,7 +5,7 @@
 
 ```bash
 $ docker pull richardbaihe/pytorch:lastest
-$ docker container run -itd  --name test_env  --mount type=bind,source=/data/projects/,target=/root/projects --mount type=bind,source=/data/datasets/,target=/root/datasets --mount type=bind,source=/data/checkpoints/,target=/root/checkpoints   --shm-size=16g richardbaihe/pytorch:lastest /bin/zsh
+$ docker container run -itd --gpus all --name test_env  --mount type=bind,source=/data/projects/,target=/root/projects --mount type=bind,source=/data/datasets/,target=/root/datasets --mount type=bind,source=/data/checkpoints/,target=/root/checkpoints   --shm-size=16g richardbaihe/pytorch:lastest /bin/zsh
 $ docker attach test_env
 ```
 
