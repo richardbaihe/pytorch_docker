@@ -1,31 +1,38 @@
-ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:20.07-py3 
+ARG BASE_IMAGE=pytorch/pytorch:1.8.0-cuda11.1-cudnn8-devel
 FROM $BASE_IMAGE                                                                        
 MAINTAINER richardbaihe <h32bai@uwaterloo.ca>                                                                 
-ENV HOME=/home/{user} USER=baihe ANACONDA_HOME=/home/{user}/anaconda3                                            
-USER root                                                                                                
-# add user                                                                                               
-RUN useradd --create-home --no-log-init --shell /bin/zsh $USER \                                         
-    && adduser $USER sudo \                                                                              
-    && echo '{user}:{password}' | chpasswd                                                    
+ENV HOME=/root               
+USER root       
+WORKDIR $HOME                                                                                            
 
 # ===============
 # system packages
 # ===============
 RUN apt-get update \                                                                                  
-    && apt-get install -y gcc locales zsh git curl libx11-6 libncurses5-dev tmux wget bzip2 sudo vim software-properties-common \   
+    && apt-get install -y gcc locales zsh ssh git curl libx11-6 libncurses5-dev tmux wget bzip2 sudo vim software-properties-common \   
     && rm -rf /var/lib/apt/lists/* \                                                                     
-    && chsh -s /bin/zsh      
+    && chsh -s /bin/zsh    
+
+# ===========
+# latest apex
+# ===========
+RUN echo "Installing Apex on top of ${BASE_IMAGE}"
+# uninstall Apex if present, twice to make absolutely sure :)
+RUN pip uninstall -y apex || :
+# SHA is something the user can touch to force recreation of this Docker layer,
+# and therefore force cloning of the latest version of Apex
+RUN SHA=ToUcHMe git clone https://github.com/NVIDIA/apex.git
+# COPY ./setup.py $HOME/apex/setup.py
+WORKDIR $HOME/apex
+RUN pip install -v --disable-pip-version-check --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
+WORKDIR $HOME
+  
 
 # Set the locale
 RUN locale-gen en_US.UTF-8  
 ENV LANG en_US.UTF-8  
 ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8  
-                                                                                                         
-USER $USER
-RUN chmod 777 $HOME
-WORKDIR $HOME
-COPY ./requirements.txt $HOME/                                                 
+ENV LC_ALL en_US.UTF-8                
 
 # ===============
 # ohmyzsh and vim
@@ -38,31 +45,27 @@ RUN git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \
 COPY ./zshrc $HOME/.zshrc
 
 # ===============
-# anaconda and pip packages
+# pip packages
 # ===============
-RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh -O ~/anaconda.sh \
-    && /bin/sh ~/anaconda.sh -b -p $ANACONDA_HOME \                                                      
-    && rm ~/anaconda.sh                                                                                 
-ENV PATH="$HOME/anaconda3/bin:${PATH}"
-RUN pip install --no-cache-dir -r requirements.txt         
-RUN python -m nltk.downloader punkt
-RUN python -m nltk.downloader stopwords
-RUN python -m nltk.downloader wordnet
+RUN pip install nltk
+RUN python -m nltk.downloader punkt wordnet
+RUN pip install wandb
 RUN echo $PATH
 
-# ===========
-# latest apex
-# ===========
-RUN echo "Installing Apex on top of ${BASE_IMAGE}"
-# uninstall Apex if present, twice to make absolutely sure :)
-RUN pip uninstall -y apex || :
-RUN pip uninstall -y apex || :
-# SHA is something the user can touch to force recreation of this Docker layer,
-# and therefore force cloning of the latest version of Apex
-RUN SHA=ToUcHMe git clone https://github.com/NVIDIA/apex.git
-COPY ./setup.py $HOME/apex/setup.py
-WORKDIR $HOME/apex
-RUN pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" .
-WORKDIR /workspace
+
+RUN apt-get update && apt-get install -y openssh-server sudo
+RUN mkdir /var/run/sshd
+RUN echo 'root:password' | chpasswd
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+
+EXPOSE 22
+
 
 CMD ["/bin/zsh"]
+
